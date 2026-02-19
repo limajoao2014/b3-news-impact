@@ -1,9 +1,9 @@
 from sqlalchemy  import Column, Integer, String, Float, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from app.db import base 
+from app.db import Base 
 
-class Company(base):
+class Company(Base):
     __tablename__ = "companies"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -11,47 +11,47 @@ class Company(base):
     name = Column(String)
     sector = Column(String)
 
+    # Relacionamento: Uma empresa tem muitos preços
     prices = relationship("Price", back_populates="company")
-    news = relationship("News", back_populates="company")   
 
+    news = relationship("News", back_populates="company")
+    #analysis = relationship("Analysis", back_populates="company")
 
-class Price(base):
+# --- ADICIONE ESTA CLASSE NOVA ---
+class Price(Base):
     __tablename__ = "prices"
 
-    id = Column(Integer, primary_key=True)
-    ticker = Column(String, index=True)
-    close = Column(Float)
-    open = Column(Float)
-    high = Column(Float)
-    low = Column(Float)
-    volume = Column(Float)
-    collected_at = Column(DateTime, default=datetime.utcnow)
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, ForeignKey("companies.id")) # Link com a empresa
+    price = Column(Float)  # Preço de fechamento
+    date = Column(DateTime, default=datetime.utcnow) # Data da coleta
 
-    company_id = Column(Integer, ForeignKey("companies.id"))
+    # Relacionamento de volta
     company = relationship("Company", back_populates="prices")
 
-
-class News(base):
+class News(Base):
     __tablename__ = "news"
 
-    id = Column(Integer, primary_key=True)
-    ticker = Column(String, index=True)
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, ForeignKey("companies.id"), nullable=True) # Pode ser null se for notícia geral
     title = Column(String)
-    source = Column(String)
-    url = Column(String, unique=True)
-    snippet = Column(Text)
+    summary = Column(Text)
+    url = Column(String, unique=True) # Evita notícias duplicadas
+    source = Column(String) # Ex: "InfoMoney"
     published_at = Column(DateTime)
-    hash_dedupe = Column(String, unique=True)
+    
+    # Campos que a IA vai preencher depois
+    sentiment = Column(String, nullable=True) # Positivo/Negativo
+    impact_score = Column(Integer, nullable=True) # 1 a 5
 
-    company_id = Column(Integer, ForeignKey("companies.id"))
     company = relationship("Company", back_populates="news")
 
 
-class Analysis(base):
+class Analysis(Base):
     __tablename__ = "analysis"
 
     id = Column(Integer, primary_key=True)
-    news_id = Column(Integer, ForeignKey("news.id"))
+    # news_id = Column(Integer, ForeignKey("news.id"))
     sentiment = Column(String)
     impact_level = Column(String)
     time_horizon = Column(String)

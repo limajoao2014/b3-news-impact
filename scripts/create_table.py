@@ -1,6 +1,6 @@
 from app.db import engine
-from app.models import base
+from app.models import Base
 
 print("Criando tabelas...")
-base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 print("Tabelas criadas com sucesso.")

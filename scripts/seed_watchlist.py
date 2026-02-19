@@ -1,6 +1,6 @@
 # scripts/seed_watchlist.py
 
-from app.db import sessionLocal
+from app.db import SessionLocal
 from app.models import Company
 
 watchlist = [
@@ -16,7 +16,7 @@ watchlist = [
     ("B3SA3", "B3", "Financeiro")
 ]
 
-db = sessionLocal()
+db = SessionLocal()
 
 for ticker, name, sector in watchlist:
     exists = db.query(Company).filter(Company.ticker == ticker).first()
